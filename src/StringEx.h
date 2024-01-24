@@ -2,6 +2,8 @@
 #define _MENCI_HTML_PARSER_STRINGEX_H
 
 #include <cctype>
+#include <istream>
+#include <ostream>
 #include <string>
 #include <vector>
 #include <utility>
