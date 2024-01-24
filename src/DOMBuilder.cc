@@ -152,15 +152,17 @@ DOM::RootNode buildDOM(const std::vector<Token> &tokens) {
 
         switch (token.type) {
         case Token::Type::TagLike:
-            static const std::string commentStart = "<!--",
-                                     commentEnd = "-->";
+        {
+            static const std::string commentStart = "<!--", commentEnd = "-->";
+
             if (token.content.startsWith(commentStart) && token.content.endsWith(commentEnd)) {
                 // Comment
                 currentNode->children.push_back(std::make_shared<DOM::CommentNode>(currentNode, token.content.substr(
                     commentStart.length(),
                     token.content.length() - commentStart.length() - commentEnd.length()
                 )));
-            } else {
+            }
+            else {
                 // Tag open or tag close.
 
                 if (!token.content.startsWith("</")) {
@@ -171,27 +173,29 @@ DOM::RootNode buildDOM(const std::vector<Token> &tokens) {
                     currentNode->children.push_back(tag);
 
                     if (std::find(std::begin(emptyElements),
-                                  std::end(emptyElements),
-                                  tag->tagName)
-                     == std::end(emptyElements)) {
+                        std::end(emptyElements),
+                        tag->tagName)
+                        == std::end(emptyElements)) {
                         // It's NOT a empty element. Open a new subtree.
                         currentNode = tag.get();
                     }
-                } else {
+                }
+                else {
                     // Tag close.
                     StringEx tagName = parseTagClose(token.content);
 
                     if (std::find(std::begin(emptyElements),
-                                  std::end(emptyElements),
-                                  tagName)
-                     != std::end(emptyElements)) {
+                        std::end(emptyElements),
+                        tagName)
+                        != std::end(emptyElements)) {
                         // Someone silly is trying to close a empty element. Just ignore it.
-                    } else {
+                    }
+                    else {
                         // OK. Let's close it.
-                        
-                        DOM::NodeWithChildren *originalCurrentNode = currentNode;
-                        DOM::ElementNode *currentElement;
-                        while ((currentElement = dynamic_cast<DOM::ElementNode *>(currentNode)) != nullptr // The node IS a element
+
+                        DOM::NodeWithChildren* originalCurrentNode = currentNode;
+                        DOM::ElementNode* currentElement;
+                        while ((currentElement = dynamic_cast<DOM::ElementNode*>(currentNode)) != nullptr // The node IS a element
                             && currentElement->tagName != tagName) {                                       // and tag name is not matched.
                             // Close current node and continue to check tag name if tag name is NOT matched.
                             currentNode = currentNode->parentNode;
@@ -200,14 +204,15 @@ DOM::RootNode buildDOM(const std::vector<Token> &tokens) {
                         if (currentElement == nullptr) {
                             // Someone silly is trying to close a non-exist tag. Just ignore it and go back.
                             currentNode = originalCurrentNode;
-                        } else {
+                        }
+                        else {
                             // Close current element's node.
                             currentNode = currentNode->parentNode;
                         }
                     }
                 }
             }
-
+        }
             break;
         case Token::Type::Text:
             // <!DOCTYPE> is lexed to some text -- since we don't support it, just ignore it.
